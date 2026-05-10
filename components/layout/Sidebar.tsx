@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, MapPin, PlusCircle, Compass, User, ChevronLeft, ChevronRight } from 'lucide-react'
+import { LayoutDashboard, MapPin, PlusCircle, Compass, User, ChevronLeft, ChevronRight, ShieldCheck } from 'lucide-react'
 import { useState } from 'react'
 import { MandalaWatermark } from '@/components/ui/MandalaWatermark'
 
@@ -57,7 +57,7 @@ export function Sidebar() {
                 <span className="flex-1 min-w-0">
                   <span className={`font-outfit text-[15px] font-bold block leading-none ${active ? 'text-deep' : 'text-sand'}`}>{label}</span>
                   <span
-                    className={`text-[12px] font-devanagari mt-1 block ${active ? 'text-deep/70' : 'text-sun/50'}`}
+                    className={`text-[15px] font-devanagari mt-1 block ${active ? 'text-deep/70' : 'text-sun/50'}`}
                   >
                     {hindi}
                   </span>

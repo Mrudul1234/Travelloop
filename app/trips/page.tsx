@@ -68,7 +68,7 @@ export default function TripsPage() {
           <div className="relative z-10 flex items-end justify-between">
             <div>
               <p className="font-syne text-xs text-sun/50 uppercase tracking-widest mb-1">मेरी यात्राएं</p>
-              <h1 className="font-display text-3xl text-sand">My Trips</h1>
+              <h1 className="font-display text-4xl text-sand">My Trips</h1>
             </div>
             <Link href="/trips/new" className="flex items-center gap-2 bg-sun hover:bg-stone text-deep font-syne font-bold text-xs px-5 py-2.5 rounded-full transition-all">
               <Plus size={14} /> New Trip

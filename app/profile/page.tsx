@@ -57,22 +57,27 @@ export default function ProfilePage() {
   }, [])
 
   const handleSave = async () => {
-    setSaving(true)
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+    try {
+      setSaving(true)
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('User not authenticated')
 
-    const { error } = await supabase.from('profiles').update({
-      full_name: profile.full_name,
-      bio: profile.bio,
-      avatar_url: profile.avatar_url,
-    }).eq('id', user.id)
+      const { error } = await supabase.from('profiles').upsert({
+        id: user.id,
+        full_name: profile.full_name,
+        bio: profile.bio,
+        avatar_url: profile.avatar_url,
+        updated_at: new Date().toISOString(),
+      })
 
-    if (error) {
-      toast.error('Failed to update profile')
-    } else {
+      if (error) throw error
       toast.success('Profile updated! ✨')
+    } catch (err: any) {
+      console.error('Update error:', err)
+      toast.error(err.message || 'Failed to update profile')
+    } finally {
+      setSaving(false)
     }
-    setSaving(false)
   }
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -196,7 +201,7 @@ export default function ProfilePage() {
                   <input
                     value={profile.full_name}
                     onChange={e => setProfile(p => ({ ...p, full_name: e.target.value }))}
-                    className="w-full bg-sun/20 border border-stone/30 rounded-xl px-4 py-3 pl-11 font-dm-sans text-sm text-deep focus:outline-none focus:border-earth"
+                    className="w-full bg-white/50 border border-stone/20 rounded-xl px-4 py-3 pl-11 font-dm-sans text-sm text-deep placeholder:text-dust/50 focus:outline-none focus:border-earth focus:bg-white focus:ring-4 focus:ring-earth/5 transition-all duration-300"
                     placeholder="Enter your name"
                   />
                 </div>
@@ -208,7 +213,7 @@ export default function ProfilePage() {
                   value={profile.bio}
                   onChange={e => setProfile(p => ({ ...p, bio: e.target.value }))}
                   rows={3}
-                  className="w-full bg-sun/20 border border-stone/30 rounded-xl px-4 py-3 font-dm-sans text-sm text-deep focus:outline-none focus:border-earth resize-none"
+                  className="w-full bg-white/50 border border-stone/20 rounded-xl px-4 py-3 font-dm-sans text-sm text-deep placeholder:text-dust/50 focus:outline-none focus:border-earth focus:bg-white focus:ring-4 focus:ring-earth/5 transition-all duration-300 resize-none"
                   placeholder="Tell us about your travel style..."
                 />
               </div>

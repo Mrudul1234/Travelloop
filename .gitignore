@@ -24,9 +24,12 @@ yarn-error.log*
 
 # local env files
 .env*.local
+.env
 
-# local scripts
-*.ps1
+# local scripts & logs
+push_log.txt
+test.txt
+RENAME_IMAGES.bat
 
 # typescript
 *.tsbuildinfo

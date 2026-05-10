@@ -103,7 +103,7 @@ export default function DashboardPage() {
               <Badge variant="success" className="mb-3 animate-pulse">Ongoing Trip: {ongoingTrip.name}</Badge>
             )}
             <p
-              className="font-syne text-xs text-sun/60 uppercase tracking-widest mb-1"
+              className="font-syne text-sm text-sun/70 uppercase tracking-widest mb-1"
               style={{ fontFamily: "'Noto Sans Devanagari', sans-serif" }}
             >
               {greeting}

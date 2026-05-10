@@ -26,13 +26,19 @@ export default function AuthPage() {
     setLoading(true)
     try {
       if (mode === 'signup') {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email: form.email,
           password: form.password,
           options: { data: { full_name: form.name } },
         })
         if (error) throw error
-        toast.success('Account created! Check your email 📧')
+        
+        if (data.session) {
+          toast.success('Account created! Welcome to Travelloop ✈️')
+          window.location.href = '/dashboard'
+        } else {
+          toast.success('Account created! Check your email 📧')
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email: form.email,

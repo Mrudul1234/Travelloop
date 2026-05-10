@@ -196,7 +196,7 @@ function NewTripContent() {
           <MandalaWatermark size={300} opacity={0.06} color="#FCD594" className="right-4 top-1/2 -translate-y-1/2" />
           <div className="relative z-10">
             <p className="font-syne text-xs text-sun/50 uppercase tracking-widest mb-1">नई यात्रा</p>
-            <h1 className="font-display text-3xl text-sand">Plan a New Trip</h1>
+            <h1 className="font-display text-4xl text-sand">Plan a New Trip</h1>
             <p className="font-dm-sans text-sand/50 text-sm mt-1">Tell us where you want to go</p>
           </div>
         </div>
