@@ -60,7 +60,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="font-inter bg-sand text-lg antialiased">
+      <body className="font-inter bg-sand text-sm antialiased">
         {children}
         <Toaster
           position="top-right"

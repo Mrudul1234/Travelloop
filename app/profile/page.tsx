@@ -75,6 +75,47 @@ export default function ProfilePage() {
     setSaving(false)
   }
 
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    try {
+      setSaving(true)
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${user.id}-${Math.random()}.${fileExt}`
+      const filePath = `avatars/${fileName}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file)
+
+      if (uploadError) throw uploadError
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath)
+
+      setProfile(p => ({ ...p, avatar_url: publicUrl }))
+      toast.success('Photo uploaded to cloud! Save to apply.')
+    } catch (err: any) {
+      console.warn('Storage upload failed, using local preview fallback:', err)
+      
+      // Fallback: Read as Base64 so the user still sees the change locally
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        const base64 = event.target?.result as string
+        setProfile(p => ({ ...p, avatar_url: base64 }))
+        toast.success('Local preview updated! Save to apply.')
+      }
+      reader.readAsDataURL(file)
+    } finally {
+      setSaving(false)
+    }
+  }
+
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     window.location.href = '/auth'
@@ -98,8 +139,8 @@ export default function ProfilePage() {
         <div className="relative bg-deep px-6 md:px-10 py-12 overflow-hidden">
           <MandalaWatermark size={400} opacity={0.07} color="#FCD594" className="right-0 top-1/2 -translate-y-1/2" />
           <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
-            <div className="relative group">
-              <div className="w-24 h-24 rounded-full border-2 border-sun p-1 overflow-hidden bg-earth">
+            <div className="relative group cursor-pointer" onClick={() => document.getElementById('avatar-input')?.click()}>
+              <div className="w-24 h-24 rounded-full border-2 border-sun p-1 overflow-hidden bg-earth transition-transform group-hover:scale-105">
                 {profile.avatar_url ? (
                   <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover rounded-full" />
                 ) : (
@@ -108,9 +149,16 @@ export default function ProfilePage() {
                   </div>
                 )}
               </div>
-              <button className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-sun text-deep flex items-center justify-center shadow-lg border-2 border-deep hover:bg-sand transition-colors">
-                <Camera size={14} />
-              </button>
+              <div className="absolute inset-0 bg-black/20 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                 <Camera size={24} className="text-sand" />
+              </div>
+              <input 
+                id="avatar-input"
+                type="file" 
+                accept="image/*" 
+                className="hidden" 
+                onChange={handleUpload}
+              />
             </div>
             
             <div className="text-center md:text-left">

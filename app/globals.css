@@ -159,11 +159,11 @@ h2, h3 {
 }
 
 /* Base sizing overrides */
-.text-xs { font-size: 0.875rem; } /* 14px */
-.text-sm { font-size: 1rem; }    /* 16px */
-.text-base { font-size: 1.125rem; } /* 18px */
-.text-lg { font-size: 1.25rem; }   /* 20px */
-.text-xl { font-size: 1.5rem; }    /* 24px */
+.text-xs { font-size: 0.75rem; } /* 12px */
+.text-sm { font-size: 0.875rem; } /* 14px */
+.text-base { font-size: 0.9375rem; }    /* 15px */
+.text-lg { font-size: 1.125rem; } /* 18px */
+.text-xl { font-size: 1.25rem; }   /* 20px */
 
 /* Activity type colors */
 .activity-sightseeing {

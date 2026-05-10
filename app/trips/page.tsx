@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Plus, MapPin, Calendar, Wallet, ChevronRight } from 'lucide-react'
+import { Plus, MapPin, Calendar, Wallet, ChevronRight, Trash2 } from 'lucide-react'
+import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { BottomNav } from '@/components/layout/BottomNav'
@@ -34,6 +35,21 @@ export default function TripsPage() {
     }
     load()
   }, [])
+
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    if (!confirm('Are you sure you want to delete this trip? This cannot be undone.')) return
+    
+    const { error } = await supabase.from('trips').delete().eq('id', id)
+    if (error) {
+      toast.error('Failed to delete trip')
+    } else {
+      setTrips(trips.filter(t => t.id !== id))
+      toast.success('Trip deleted! 🗑️')
+    }
+  }
 
   const filtered = trips.filter(t => {
     if (filter === 'all') return true
@@ -129,7 +145,13 @@ export default function TripsPage() {
                             <span className="font-display text-sm text-earth font-semibold">{formatCurrency(trip.total_budget)}</span>
                           </div>
                         </div>
-                        <div className="px-4 pb-4 flex justify-end">
+                        <div className="px-4 pb-4 flex justify-between items-center">
+                          <button 
+                            onClick={(e) => handleDelete(e, trip.id)}
+                            className="w-8 h-8 rounded-full bg-danger/10 text-danger hover:bg-danger hover:text-sand transition-all flex items-center justify-center"
+                          >
+                            <Trash2 size={14} />
+                          </button>
                           <span className="font-syne text-[10px] text-earth uppercase tracking-wide flex items-center gap-1 hover:gap-2 transition-all">
                             View Trip <ChevronRight size={10} />
                           </span>

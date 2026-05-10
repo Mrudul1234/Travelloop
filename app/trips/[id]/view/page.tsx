@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Edit2, MapPin, Calendar, Wallet, Map, CheckSquare, BarChart2, Share2 } from 'lucide-react'
+import { ArrowLeft, Edit2, MapPin, Calendar, Wallet, Map, CheckSquare, BarChart2, Share2, Trash2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { BottomNav } from '@/components/layout/BottomNav'
@@ -101,12 +101,42 @@ export default function TripViewPage() {
             { href: `/trips/${id}/build`, icon: Map, label: 'Itinerary' },
             { href: `/trips/${id}/budget`, icon: BarChart2, label: 'Budget' },
             { href: `/trips/${id}/checklist`, icon: CheckSquare, label: 'Checklist' },
-            { href: '#', icon: Share2, label: 'Share', onClick: () => { navigator.clipboard.writeText(window.location.href); toast.success('Link copied!') } },
+            { 
+              href: '#', 
+              icon: Share2, 
+              label: 'Share', 
+              onClick: async () => {
+                const shareData = {
+                  title: `My Trip: ${trip?.name}`,
+                  text: `Check out my travel plan for ${trip?.name} on Travelloop!`,
+                  url: window.location.href,
+                }
+                
+                try {
+                  if (navigator.share) {
+                    await navigator.share(shareData)
+                    toast.success('Shared successfully!')
+                  } else {
+                    await navigator.clipboard.writeText(window.location.href)
+                    toast.success('Link copied to clipboard!')
+                  }
+                } catch (err) {
+                  console.error(err)
+                }
+              } 
+            },
           ].map(({ href, icon: Icon, label, onClick }) => (
-            <Link key={label} href={href} onClick={onClick} className="flex flex-col items-center gap-1.5 py-4 hover:bg-sun/40 transition-colors">
-              <Icon size={18} className="text-earth" />
-              <span className="font-syne text-[10px] text-deep uppercase tracking-wide">{label}</span>
-            </Link>
+            onClick ? (
+              <button key={label} onClick={onClick} className="flex flex-col items-center gap-1.5 py-4 hover:bg-sun/40 transition-colors">
+                <Icon size={18} className="text-earth" />
+                <span className="font-syne text-[10px] text-deep uppercase tracking-wide">{label}</span>
+              </button>
+            ) : (
+              <Link key={label} href={href} className="flex flex-col items-center gap-1.5 py-4 hover:bg-sun/40 transition-colors">
+                <Icon size={18} className="text-earth" />
+                <span className="font-syne text-[10px] text-deep uppercase tracking-wide">{label}</span>
+              </Link>
+            )
           ))}
         </div>
 
@@ -177,6 +207,25 @@ export default function TripViewPage() {
                 ))}
               </div>
             )}
+          </div>
+          
+          <JaliDivider />
+
+          <div className="pt-10 flex justify-center">
+            <button 
+              onClick={async () => {
+                if (!confirm('Are you sure you want to delete this entire trip?')) return
+                const { error } = await supabase.from('trips').delete().eq('id', id)
+                if (error) toast.error('Failed to delete')
+                else {
+                  toast.success('Trip deleted! 🗑️')
+                  router.push('/trips')
+                }
+              }}
+              className="flex items-center gap-2 text-danger hover:text-white hover:bg-danger px-6 py-3 rounded-full border border-danger/20 transition-all font-syne text-xs font-bold"
+            >
+              <Trash2 size={16} /> Delete Entire Trip
+            </button>
           </div>
         </div>
       </div>

@@ -108,10 +108,10 @@ export default function DashboardPage() {
             >
               {greeting}
             </p>
-            <h1 className="font-display text-4xl md:text-5xl text-sand">
+            <h1 className="font-display text-3xl md:text-5xl text-sand leading-[1.1]">
               Namaste, <span className="text-sun">{userName}</span> 🙏
             </h1>
-            <p className="font-dm-sans text-sand/50 text-sm mt-2">Your next adventure awaits. Chalo plan karte hain!</p>
+            <p className="font-dm-sans text-sand/50 text-xs md:text-sm mt-2">Your next adventure awaits. Chalo plan karte hain!</p>
 
             <Link
               href="/trips/new"

@@ -12,6 +12,7 @@ import { MandalaWatermark } from '@/components/ui/MandalaWatermark'
 import { ArchImage } from '@/components/ui/ArchImage'
 import { Badge } from '@/components/ui/Badge'
 import { JaliDivider } from '@/components/ui/JaliDivider'
+import toast from 'react-hot-toast'
 
 const CATEGORIES = [
   { id: 'all', label: 'All', icon: '✨' },
@@ -30,6 +31,24 @@ export default function ExplorePage() {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('all')
   const [view, setView] = useState<'destinations' | 'trips'>('destinations')
+  const [liked, setLiked] = useState<Set<any>>(new Set())
+
+  const toggleLike = (id: any) => {
+    const isCurrentlyLiked = liked.has(id)
+    
+    setLiked(prev => {
+      const next = new Set(prev)
+      if (isCurrentlyLiked) next.delete(id)
+      else next.add(id)
+      return next
+    })
+    
+    if (!isCurrentlyLiked) {
+      toast.success('Added to favorites! ❤️')
+    } else {
+      toast('Removed from favorites', { icon: '💔' })
+    }
+  }
 
   useEffect(() => {
     const load = async () => {
@@ -124,7 +143,7 @@ export default function ExplorePage() {
               </button>
             </div>
 
-            <div className="flex gap-3 overflow-x-auto scrollbar-none pb-2">
+            <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
               {CATEGORIES.map(cat => (
                 <button
                   key={cat.id}
@@ -177,9 +196,14 @@ export default function ExplorePage() {
                         <div className="bg-sand/90 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20">
                           <span className="font-syne text-[9px] text-earth font-bold uppercase tracking-widest">{dest.state}</span>
                         </div>
-                        <div className="bg-sun/90 backdrop-blur-md w-10 h-10 rounded-full flex items-center justify-center text-deep shadow-lg">
-                          <Heart size={18} />
-                        </div>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); toggleLike(dest.id) }}
+                          className={`w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all transform active:scale-125 z-20 ${
+                            liked.has(dest.id) ? 'bg-danger text-sand scale-110' : 'bg-sun/90 backdrop-blur-md text-deep hover:bg-sun'
+                          }`}
+                        >
+                          <Heart size={18} className={liked.has(dest.id) ? 'fill-sand' : ''} />
+                        </button>
                       </div>
 
                       <div className="absolute bottom-8 left-8 right-8 text-sand">

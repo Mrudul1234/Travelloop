@@ -1,45 +1,77 @@
-# 🏯 TRAVELOOP — Heritage Editorial Travel Planner
+# ⛺️ TRAVELOOP
+### *Experience India's Heritage, One Curated Itinerary at a Time.*
 
-**TRAVELOOP** is a premium Indian travel planning application built for the modern explorer. It blends high-fidelity modern UI with a "Heritage Editorial" aesthetic inspired by Mughal architecture and Indian earth-tone palettes.
-
-![Preview](https://images.unsplash.com/photo-1548013146-72479768bada?w=1200&q=80)
-
-## ✨ Features
-
-- **14 Core Screens**: Fully implemented from Auth to Itinerary Building.
-- **AI Itinerary Generator**: Powered by Gemini AI for context-aware travel suggestions.
-- **Heritage Design System**: Earth-tone palettes (Sand, Sun, Earth, Deep) with Jali dividers and Mandala watermarks.
-- **Trip Builder**: Interactive stop management with activity tracking.
-- **Budget & Checklist**: Full-stack integration for expense management and packing lists.
-- **Supabase Integration**: Robust real-time data persistence with RLS policies.
-
-## 🚀 Tech Stack
-
-- **Frontend**: Next.js 14 (App Router)
-- **Styling**: Tailwind CSS
-- **Animations**: Framer Motion
-- **Icons**: Lucide React
-- **Database/Auth**: Supabase
-- **AI**: Google Gemini API
-- **APIs**: Unsplash (Photos), GeoDB (Cities)
-
-## 🛠️ Setup
-
-1. **Clone the repo**
-2. **Install dependencies**: `npm install`
-3. **Configure Environment**: Create a `.env.local` file:
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=your_url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
-   GEMINI_API_KEY=your_key
-   UNSPLASH_ACCESS_KEY=your_key
-   GEODB_API_KEY=your_key
-   ```
-4. **Database Schema**: Apply the SQL from `scripts/schema.sql` in your Supabase SQL editor.
-5. **Run**: `npm run dev`
+[![Vercel](https://img.shields.io/badge/Vercel-Deployment-black?style=for-the-badge&logo=vercel)](https://vercel.com/)
+[![Next.js](https://img.shields.io/badge/Next.js-14-blue?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-Backend-green?style=for-the-badge&logo=supabase)](https://supabase.com/)
 
 ---
 
-*भारत की यात्रा, अपने अंदाज़ में। (India's journey, in your style.)*
+## 🚀 Hackathon Vision
+Most travel planners are generic. **TRAVELLOOP** is different. We built a **Heritage-First** travel ecosystem specifically designed for the Indian landscape. By blending modern AI intelligence with a "Heritage Modern" aesthetic, we've created a tool that feels as premium as the destinations it explores.
 
-**Build Version**: 1.0.1 (Fixed Badge Types - 2026-05-10)
+## ✨ Key Features
+
+### 🧠 1. AI-Powered "Heritage" Itineraries
+Our custom-tuned AI engine doesn't just list places; it crafts **cultural narratives**. It generates day-by-day plans for Indian cities (Jaipur, Udaipur, Kerala, etc.) with a focus on local experiences, timings, and budget accuracy.
+- **Fail-Safe Mode**: Built-in triple-redundancy ensures you get a plan even if the AI is offline.
+
+### 🗺️ 2. Interactive Geo-Picker
+Forget typing city names. Our interactive Map UI (Leaflet-powered) allows users to physically tap through the geography of India to select their stops. It's visual, intuitive, and fun.
+
+### 💰 3. Real-Time Budget Guardian
+Travel in India varies from budget backpacker to royal luxury. Our budget tracker allows real-time expense logging with categorized spending (Food, Stay, Transport) and instant balance calculation.
+
+### 📸 4. Dynamic Destination Imagery
+The app feels alive. Every trip you create automatically pulls stunning high-fidelity photography for that specific city. If you plan a trip to Udaipur, your dashboard becomes Udaipur.
+
+### 📱 5. Mobile-First Heritage UI
+Designed with a "Heritage Modern" design system:
+- **Mandala Watermarks**: Subtle cultural motifs.
+- **Gold & Earth Palette**: Reflecting the vibrant colors of India.
+- **Glassmorphism**: Modern tech feel with a traditional soul.
+
+---
+
+## 🛠️ Tech Stack
+- **Frontend**: Next.js 14 (App Router), Tailwind CSS, Framer Motion
+- **Intelligence**: Google Gemini 1.5 Flash API
+- **Visuals**: Unsplash Developer API, Leaflet.js
+- **Backend**: Supabase (PostgreSQL + Auth + Storage)
+- **Deployment**: Vercel
+
+---
+
+## ⚙️ Setup & Installation
+
+### 1. Database Setup (Supabase)
+Run the following SQL in your Supabase Editor to create the necessary schema:
+```sql
+-- See scripts/schema.sql for the full database structure
+-- Crucial tables: trips, stops, activities, expenses, profiles
+```
+
+### 2. Environment Variables
+Create a `.env.local` file with the following:
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
+GEMINI_API_KEY=your_google_ai_key
+UNSPLASH_ACCESS_KEY=your_unsplash_key
+```
+
+### 3. Run Locally
+```bash
+npm install
+npm run dev
+```
+
+---
+
+## 🏆 Hackathon Goal
+Our goal was to solve the "Generic Travel" problem by creating an app that respects the specific cultural and geographical nuances of India. **Travelloop** is not just an app; it's a digital companion for the modern Indian explorer.
+
+---
+
+## 📄 License
+MIT License. Created with ❤️ for the Indian travel community.
