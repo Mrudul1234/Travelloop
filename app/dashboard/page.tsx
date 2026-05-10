@@ -28,6 +28,7 @@ export default function DashboardPage() {
   const supabase = createClient()
   const [userName, setUserName] = useState('Traveller')
   const [trips, setTrips] = useState<any[]>([])
+  const [ongoingTrip, setOngoingTrip] = useState<any>(null)
   const [inspiration, setInspiration] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -47,6 +48,9 @@ export default function DashboardPage() {
         .limit(4)
 
       setTrips(tripsData || [])
+      
+      const ongoing = tripsData?.find(t => tripStatus(t.start_date, t.end_date) === 'ongoing')
+      setOngoingTrip(ongoing || null)
       
       // Load inspiration from dataset
       const destRes = await fetch('/api/destinations')
@@ -80,9 +84,24 @@ export default function DashboardPage() {
         <GrainOverlay />
 
         {/* Hero section */}
-        <div className="relative bg-deep px-6 md:px-10 py-10 overflow-hidden">
+        <div className="relative bg-deep px-6 md:px-10 py-12 overflow-hidden transition-all duration-700">
+          {/* Dynamic Hero Background */}
+          {ongoingTrip && (
+            <div className="absolute inset-0 z-0">
+              <img 
+                src={ongoingTrip.cover_photo} 
+                className="w-full h-full object-cover opacity-30 scale-105 animate-soft-zoom" 
+                alt="Current Trip"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-deep/20 via-deep to-deep" />
+            </div>
+          )}
+          
           <MandalaWatermark size={500} opacity={0.07} color="#FCD594" animate className="right-0 top-1/2 -translate-y-1/2" />
           <div className="relative z-10">
+            {ongoingTrip && (
+              <Badge variant="success" className="mb-3 animate-pulse">Ongoing Trip: {ongoingTrip.name}</Badge>
+            )}
             <p
               className="font-syne text-xs text-sun/60 uppercase tracking-widest mb-1"
               style={{ fontFamily: "'Noto Sans Devanagari', sans-serif" }}
@@ -96,7 +115,7 @@ export default function DashboardPage() {
 
             <Link
               href="/trips/new"
-              className="inline-flex items-center gap-2 mt-5 bg-sun hover:bg-stone text-deep font-syne font-bold text-xs px-6 py-3 rounded-full transition-all hover:scale-[1.02]"
+              className="inline-flex items-center gap-2 mt-6 bg-sun hover:bg-stone text-deep font-syne font-bold text-xs px-8 py-3.5 rounded-full shadow-lg shadow-sun/20 transition-all hover:scale-[1.03]"
             >
               <PlusCircle size={15} />
               Plan New Trip

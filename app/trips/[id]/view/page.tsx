@@ -153,18 +153,26 @@ export default function TripViewPage() {
                     initial={{ opacity: 0, x: -12 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.07 }}
-                    className="flex items-center gap-4 bg-sun/50 border border-stone/20 rounded-2xl p-4"
+                    className="flex items-center gap-4 bg-sun/50 border border-stone/20 rounded-2xl p-3"
                   >
-                    <div className="w-8 h-8 rounded-full bg-earth text-sand flex items-center justify-center font-syne text-xs font-bold flex-shrink-0">
-                      {i + 1}
+                    <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
+                      <img
+                        src={getFallbackPhoto(stop.city_name)}
+                        alt={stop.city_name}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-playfair font-semibold text-deep">{stop.city_name}</p>
-                      <p className="font-syne text-[10px] text-dust" style={{ fontFamily: "'Noto Sans Devanagari', sans-serif" }}>
+                      <p className="font-playfair font-bold text-deep text-lg">{stop.city_name}</p>
+                      <p className="font-syne text-xs text-dust mb-1" style={{ fontFamily: "'Noto Sans Devanagari', sans-serif" }}>
                         {stop.city_name_hindi} · {stop.days} day{stop.days !== 1 ? 's' : ''}
                       </p>
+                      <Badge variant="default" className="text-[10px] py-0">{i + 1} Stop</Badge>
                     </div>
-                    <span className="font-syne text-xs text-earth">{stop.days}d</span>
+                    <div className="text-right">
+                      <span className="font-display text-lg text-earth block">₹{((trip.total_budget / stops.length) || 0).toLocaleString('en-IN')}</span>
+                      <span className="font-syne text-[10px] text-dust uppercase tracking-wider">Est. Budget</span>
+                    </div>
                   </motion.div>
                 ))}
               </div>

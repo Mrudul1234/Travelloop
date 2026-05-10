@@ -11,7 +11,7 @@ import { GrainOverlay } from '@/components/ui/GrainOverlay'
 import { MandalaWatermark } from '@/components/ui/MandalaWatermark'
 import { Badge } from '@/components/ui/Badge'
 import { getActivityTypeLabel, getActivityIcon } from '@/lib/utils'
-import { generateItinerary } from '@/lib/api'
+import { generateItinerary, getFallbackPhoto } from '@/lib/api'
 import toast from 'react-hot-toast'
 
 export default function TripBuildPage() {
@@ -92,13 +92,18 @@ export default function TripBuildPage() {
           position: j,
         }))
 
-        const { data: saved } = await supabase.from('activities').insert(toInsert).select()
+        const { data: saved, error: insertError } = await supabase.from('activities').insert(toInsert).select()
+        if (insertError) {
+          console.error('Database Insert Error:', insertError)
+          throw new Error(`${insertError.message} (Stop: ${stop.city_name})`)
+        }
         newActivities[stop.id] = saved || []
       }
       setActivities(newActivities)
       toast.success('AI itinerary generated! 🎉')
     } catch (err: any) {
-      toast.error(err.message || 'Generation failed')
+      console.error('Generation Flow Error:', err)
+      toast.error(err.message || 'Generation failed', { duration: 5000 })
     } finally {
       setGenerating(false)
     }
@@ -173,10 +178,17 @@ export default function TripBuildPage() {
         {stops.map(stop => (
           activeStop === stop.id && (
             <div key={stop.id} className="px-6 md:px-10 py-6">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h2 className="font-playfair text-xl text-deep">{stop.city_name}</h2>
-                  <p className="font-syne text-xs text-dust" style={{ fontFamily: "'Noto Sans Devanagari', sans-serif" }}>
+              {/* Stop Banner */}
+              <div className="relative h-32 rounded-2xl overflow-hidden mb-6 group">
+                <img
+                  src={getFallbackPhoto(stop.city_name)}
+                  alt={stop.city_name}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-deep/80 to-transparent" />
+                <div className="absolute inset-0 flex flex-col justify-center p-6">
+                  <h2 className="font-playfair text-2xl text-sand">{stop.city_name}</h2>
+                  <p className="font-syne text-xs text-sun/70 uppercase tracking-widest" style={{ fontFamily: "'Noto Sans Devanagari', sans-serif" }}>
                     {stop.city_name_hindi} · {stop.days} day{stop.days !== 1 ? 's' : ''}
                   </p>
                 </div>

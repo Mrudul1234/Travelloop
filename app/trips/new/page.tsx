@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, X, PlusCircle, ChevronRight, Loader2, Sparkles, Calendar, Wallet } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
-import { searchCities, generateItinerary } from '@/lib/api'
+import { searchCities, generateItinerary, getFallbackPhoto } from '@/lib/api'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { BottomNav } from '@/components/layout/BottomNav'
 import { GrainOverlay } from '@/components/ui/GrainOverlay'
@@ -14,14 +14,20 @@ import { JaliDivider } from '@/components/ui/JaliDivider'
 import { slugify, daysBetween } from '@/lib/utils'
 import toast from 'react-hot-toast'
 import type { CityResult } from '@/lib/api'
+import dynamic from 'next/dynamic'
+
+const MapPicker = dynamic(() => import('@/components/ui/MapPicker'), { 
+  ssr: false,
+  loading: () => <div className="h-[400px] w-full bg-sun/10 animate-pulse rounded-2xl border border-stone/20" />
+})
 
 const TRAVEL_STYLES = [
-  { id: 'cultural', label: 'Cultural Heritage', hindi: 'विरासत', icon: '🏛' },
-  { id: 'adventure', label: 'Adventure', hindi: 'साहसिक', icon: '🧗' },
-  { id: 'spiritual', label: 'Spiritual', hindi: 'आध्यात्मिक', icon: '🕉' },
-  { id: 'nature', label: 'Nature & Wildlife', hindi: 'प्रकृति', icon: '🌿' },
-  { id: 'food', label: 'Food & Culinary', hindi: 'भोजन', icon: '🍛' },
-  { id: 'luxury', label: 'Luxury', hindi: 'विलासिता', icon: '✨' },
+  { id: 'cultural', label: 'Cultural Heritage', hindi: 'विरासत', icon: '🏯' },
+  { id: 'adventure', label: 'Adventure', hindi: 'साहसिक', icon: '🚵' },
+  { id: 'spiritual', label: 'Spiritual', hindi: 'आध्यात्मिक', icon: '🕉️' },
+  { id: 'nature', label: 'Nature & Wildlife', hindi: 'प्रकृति', icon: '🐆' },
+  { id: 'food', label: 'Food & Culinary', hindi: 'भोजन', icon: '🥘' },
+  { id: 'luxury', label: 'Luxury', hindi: 'विलासिता', icon: '💎' },
 ]
 
 function NewTripContent() {
@@ -43,6 +49,7 @@ function NewTripContent() {
   const [cityResults, setCityResults] = useState<CityResult[]>([])
   const [selectedCities, setSelectedCities] = useState<CityResult[]>([])
   const [cityLoading, setCityLoading] = useState(false)
+  const [showMap, setShowMap] = useState(false)
 
   // Pre-fill destination from URL
   useEffect(() => {
@@ -70,6 +77,32 @@ function NewTripContent() {
     setCityResults([])
   }
 
+  const handleMapSelect = async (lat: number, lng: number) => {
+    setCityLoading(true)
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10`)
+      const data = await res.json()
+      const cityName = data.address.city || data.address.town || data.address.state_district || 'Selected Location'
+      
+      const city: CityResult = {
+        name: cityName,
+        state: data.address.state || '',
+        nameHindi: '',
+        lat,
+        lng
+      }
+      
+      if (!selectedCities.find(c => c.name === city.name)) {
+        setSelectedCities(prev => [...prev, city])
+        toast.success(`Added ${cityName} from map!`)
+      }
+    } catch (err) {
+      toast.error('Could not identify city from map')
+    } finally {
+      setCityLoading(false)
+    }
+  }
+
   const removeCity = (name: string) => {
     setSelectedCities(prev => prev.filter(c => c.name !== name))
   }
@@ -83,6 +116,18 @@ function NewTripContent() {
     setSaving(true)
     try {
       const name = tripName || `${selectedCities.map(c => c.name).join(' → ')} Trip`
+      // Try to fetch a real cover photo first
+      let coverPhoto = getFallbackPhoto(selectedCities[0]?.name || 'default')
+      try {
+        const photoRes = await fetch(`/api/photos?city=${encodeURIComponent(selectedCities[0].name)}`)
+        const photoData = await photoRes.json()
+        if (photoData.photos?.[0]?.url) {
+          coverPhoto = photoData.photos[0].url
+        }
+      } catch (err) {
+        console.warn('Cover photo fetch failed, using fallback')
+      }
+
       const { data: trip, error } = await supabase.from('trips').insert({
         user_id: user.id,
         name,
@@ -91,6 +136,7 @@ function NewTripContent() {
         end_date: endDate,
         total_budget: budget,
         travel_style: travelStyle,
+        cover_photo: coverPhoto,
         status: 'draft',
       }).select().single()
 
@@ -169,7 +215,15 @@ function NewTripContent() {
 
           {/* City search */}
           <div>
-            <label className="font-syne text-xs text-earth uppercase tracking-wide block mb-2">Destinations</label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="font-syne text-xs text-earth uppercase tracking-wide">Destinations</label>
+              <button 
+                onClick={() => setShowMap(!showMap)}
+                className="font-syne text-[10px] text-earth underline underline-offset-4 font-bold uppercase"
+              >
+                {showMap ? 'Show List View' : 'Select from Map 🗺️'}
+              </button>
+            </div>
 
             {/* Selected cities */}
             {selectedCities.length > 0 && (
@@ -186,44 +240,65 @@ function NewTripContent() {
               </div>
             )}
 
-            {/* Search input */}
-            <div className="relative">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-dust pointer-events-none" />
-              <input
-                value={cityQuery}
-                onChange={e => handleCitySearch(e.target.value)}
-                placeholder="Search Indian cities..."
-                className="w-full bg-sun/30 border border-stone/40 rounded-xl px-4 py-3 pl-9 font-dm-sans text-sm text-deep placeholder:text-dust focus:outline-none focus:border-earth"
-              />
-              {cityLoading && <Loader2 size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-earth animate-spin" />}
-            </div>
+            {showMap ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="mt-4 relative p-2 bg-stone/10 rounded-3xl border border-stone/20"
+              >
+                {/* Map Decorative Background */}
+                <div className="absolute inset-0 z-0 opacity-10 pointer-events-none overflow-hidden">
+                  <MandalaWatermark size={600} color="#724E43" />
+                </div>
+                <div className="relative z-10">
+                  <MapPicker onSelect={handleMapSelect} selectedCities={selectedCities} />
+                </div>
+                <p className="font-syne text-[10px] text-earth mt-3 text-center italic font-bold uppercase tracking-widest">
+                  Click on the map to add a destination
+                </p>
+              </motion.div>
+            ) : (
+              <>
+                {/* Search input */}
+                <div className="relative">
+                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-dust pointer-events-none" />
+                  <input
+                    value={cityQuery}
+                    onChange={e => handleCitySearch(e.target.value)}
+                    placeholder="Search Indian cities..."
+                    className="w-full bg-sun/30 border border-stone/40 rounded-xl px-4 py-3 pl-9 font-dm-sans text-sm text-deep placeholder:text-dust focus:outline-none focus:border-earth"
+                  />
+                  {cityLoading && <Loader2 size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-earth animate-spin" />}
+                </div>
 
-            <AnimatePresence>
-              {cityResults.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: -8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  className="mt-2 bg-sand border border-stone/30 rounded-xl overflow-hidden shadow-lg"
-                >
-                  {cityResults.map(city => (
-                    <button
-                      key={city.name}
-                      onClick={() => addCity(city)}
-                      className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-sun/40 transition-colors text-left"
+                <AnimatePresence>
+                  {cityResults.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      className="mt-2 bg-sand border border-stone/30 rounded-xl overflow-hidden shadow-lg z-50 relative"
                     >
-                      <div>
-                        <span className="font-dm-sans text-sm text-deep">{city.name}</span>
-                        <span className="font-syne text-xs text-dust ml-2">{city.state}</span>
-                      </div>
-                      <span className="font-syne text-xs text-earth" style={{ fontFamily: "'Noto Sans Devanagari', sans-serif" }}>
-                        {city.nameHindi}
-                      </span>
-                    </button>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
+                      {cityResults.map(city => (
+                        <button
+                          key={city.name}
+                          onClick={() => addCity(city)}
+                          className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-sun/40 transition-colors text-left"
+                        >
+                          <div>
+                            <span className="font-dm-sans text-sm text-deep">{city.name}</span>
+                            <span className="font-syne text-xs text-dust ml-2">{city.state}</span>
+                          </div>
+                          <span className="font-syne text-xs text-earth" style={{ fontFamily: "'Noto Sans Devanagari', sans-serif" }}>
+                            {city.nameHindi}
+                          </span>
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </>
+            )}
           </div>
 
           {/* Dates */}
@@ -299,15 +374,15 @@ function NewTripContent() {
                     onClick={() => setTravelStyle(prev =>
                       selected ? prev.filter(s => s !== id) : [...prev, id]
                     )}
-                    className={`flex flex-col items-center gap-1 px-2 py-3 rounded-xl border text-center transition-all ${
+                    className={`flex flex-col items-center gap-1.5 px-2 py-4 rounded-2xl border text-center transition-all duration-200 ${
                       selected
-                        ? 'bg-earth border-earth text-sand'
+                        ? 'bg-earth border-earth text-sand shadow-lg scale-105'
                         : 'bg-sun/20 border-stone/30 text-deep hover:bg-sun/40'
                     }`}
                   >
-                    <span className="text-xl">{icon}</span>
-                    <span className="font-syne text-[10px] font-medium leading-tight">{label}</span>
-                    <span className="text-[9px] opacity-50" style={{ fontFamily: "'Noto Sans Devanagari', sans-serif" }}>{hindi}</span>
+                    <span className="text-3xl mb-1">{icon}</span>
+                    <span className="font-outfit text-[11px] font-bold uppercase tracking-tight leading-tight">{label}</span>
+                    <span className="text-[10px] opacity-60 font-medium" style={{ fontFamily: "'Noto Sans Devanagari', sans-serif" }}>{hindi}</span>
                   </button>
                 )
               })}

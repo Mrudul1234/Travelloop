@@ -47,36 +47,55 @@ const MOCK_ITINERARY = (cities: string[]) => ({
 })
 
 export async function POST(request: NextRequest) {
-  const body = await request.json()
-  const { cities, startDate, endDate, budget } = body
+  // 1. Initial Data Extraction
+  let cities: string[] = []
+  let startDate = ''
+  let endDate = ''
+  let budget = 0
+
+  try {
+    const body = await request.json()
+    cities = body.cities || []
+    startDate = body.startDate || ''
+    endDate = body.endDate || ''
+    budget = body.budget || 30000
+  } catch (e) {
+    console.error('Failed to parse request body')
+  }
+
+  // 2. Safety Check
+  if (!cities || cities.length === 0) {
+    cities = ['Jaipur', 'Delhi'] // Emergency fallback
+  }
 
   const apiKey = process.env.GEMINI_API_KEY
 
-  if (apiKey && cities?.length > 0) {
+  // 3. Primary AI Path (Gemini)
+  if (apiKey) {
     try {
       const prompt = `You are an expert Indian travel planner. Create a detailed day-by-day itinerary for a trip to ${cities.join(', ')}, India from ${startDate} to ${endDate} with a budget of ₹${budget}.
-
-Return ONLY valid JSON in this exact format:
-{
-  "stops": [
-    {
-      "cityName": "string",
-      "cityNameHindi": "string in Hindi",
-      "days": number,
-      "activities": [
-        {
-          "name": "Activity name",
-          "nameHindi": "Hindi name",
-          "type": "sightseeing|food|transport|stay|adventure|shopping",
-          "time": "HH:MM",
-          "durationMin": number,
-          "costInr": number,
-          "description": "2-3 sentences"
-        }
-      ]
-    }
-  ]
-}`
+      
+      Return ONLY valid JSON in this exact format:
+      {
+        "stops": [
+          {
+            "cityName": "string",
+            "cityNameHindi": "string in Hindi",
+            "days": number,
+            "activities": [
+              {
+                "name": "Activity name",
+                "nameHindi": "Hindi name",
+                "type": "sightseeing|food|transport|stay|adventure|shopping",
+                "time": "HH:MM",
+                "durationMin": number,
+                "costInr": number,
+                "description": "2-3 sentences"
+              }
+            ]
+          }
+        ]
+      }`
 
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
@@ -93,21 +112,25 @@ Return ONLY valid JSON in this exact format:
 
       if (res.ok) {
         const data = await res.json()
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text
+        let text = data?.candidates?.[0]?.content?.parts?.[0]?.text
+        
         if (text) {
-          try {
-            const parsed = JSON.parse(text)
-            if (parsed.stops) return NextResponse.json(parsed)
-          } catch (_) {
-            // Fall through to mock
+          text = text.replace(/```json/g, '').replace(/```/g, '').trim()
+          const parsed = JSON.parse(text)
+          if (parsed.stops && Array.isArray(parsed.stops)) {
+            console.log('Successfully generated itinerary via Gemini')
+            return NextResponse.json(parsed)
           }
         }
+      } else {
+        console.error('Gemini API Error Status:', res.status)
       }
     } catch (err) {
-      console.error('Gemini API error:', err)
+      console.error('Gemini Execution Error:', err)
     }
   }
 
-  // Return mock data
-  return NextResponse.json(MOCK_ITINERARY(cities || ['Delhi']))
+  // 4. Guaranteed Fallback Path (Mock)
+  console.log('Returning high-fidelity mock itinerary')
+  return NextResponse.json(MOCK_ITINERARY(cities))
 }

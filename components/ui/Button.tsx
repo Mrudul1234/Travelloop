@@ -30,11 +30,11 @@ export function Button({
   }
 
   const variants = {
-    primary: 'bg-earth text-sand hover:bg-deep active:scale-[0.98] shadow-sm hover:shadow-md',
+    primary: 'bg-earth text-sand hover:bg-deep active:scale-[0.98] shadow-[0_4px_14px_0_rgba(114,78,67,0.39)] hover:shadow-[0_6px_20px_rgba(114,78,67,0.23)] border border-white/10 transition-all duration-300',
     secondary:
-      'border-2 border-earth text-earth bg-transparent hover:bg-earth/10 active:scale-[0.98]',
+      'border-2 border-earth text-earth bg-transparent hover:bg-earth/10 active:scale-[0.98] shadow-sm',
     ghost: 'text-earth hover:bg-earth/10 active:scale-[0.98]',
-    danger: 'bg-danger text-sand hover:bg-danger/90 active:scale-[0.98]',
+    danger: 'bg-danger text-sand hover:bg-danger/90 active:scale-[0.98] shadow-[0_4px_14px_0_rgba(192,57,43,0.3)]',
   }
 
   return (

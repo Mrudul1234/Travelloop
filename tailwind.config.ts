@@ -21,7 +21,8 @@ const config: Config = {
       fontFamily: {
         display: ['var(--font-display)', 'Georgia', 'serif'],
         playfair: ['var(--font-playfair)', 'Georgia', 'serif'],
-        'dm-sans': ['var(--font-dm-sans)', 'sans-serif'],
+        outfit: ['var(--font-outfit)', 'sans-serif'],
+        inter: ['var(--font-inter)', 'sans-serif'],
         syne: ['var(--font-syne)', 'sans-serif'],
         devanagari: ["'Noto Sans Devanagari'", 'sans-serif'],
       },

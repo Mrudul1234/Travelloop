@@ -14,13 +14,15 @@ const NAV_ITEMS = [
   { href: '/profile', icon: User, label: 'Profile', hindi: 'प्रोफाइल' },
 ]
 
+
+
 export function Sidebar() {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
 
   return (
     <aside
-      className={`fixed left-0 top-0 h-full bg-deep z-40 flex flex-col transition-all duration-300 hidden md:flex ${collapsed ? 'w-16' : 'w-[240px]'}`}
+      className={`fixed left-0 top-0 h-full bg-deep/95 glass-deep z-40 flex flex-col transition-all duration-300 hidden md:flex ${collapsed ? 'w-16' : 'w-[240px]'}`}
     >
       <MandalaWatermark size={300} opacity={0.05} color="#FCD594" className="bottom-0 right-0" />
 
@@ -42,19 +44,20 @@ export function Sidebar() {
             <Link
               key={href}
               href={href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 group ${
-                active
-                  ? 'bg-earth/40 text-sun'
-                  : 'text-stone hover:bg-earth/20 hover:text-sand'
+              className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-300 ${
+                active 
+                  ? 'bg-sun text-deep shadow-lg shadow-sun/20 translate-x-1' 
+                  : 'text-sand/60 hover:text-sand hover:bg-sand/5'
               }`}
             >
-              <Icon size={18} className="flex-shrink-0" />
+              <div className={`p-1.5 rounded-lg ${active ? 'bg-deep/10' : ''}`}>
+                <Icon size={22} className={active ? 'text-deep' : 'text-sun/70'} />
+              </div>
               {!collapsed && (
                 <span className="flex-1 min-w-0">
-                  <span className="font-syne text-xs font-medium block">{label}</span>
+                  <span className={`font-outfit text-[15px] font-bold block leading-none ${active ? 'text-deep' : 'text-sand'}`}>{label}</span>
                   <span
-                    className="text-[10px] opacity-40"
-                    style={{ fontFamily: "'Noto Sans Devanagari', sans-serif" }}
+                    className={`text-[12px] font-devanagari mt-1 block ${active ? 'text-deep/70' : 'text-sun/50'}`}
                   >
                     {hindi}
                   </span>
@@ -68,9 +71,9 @@ export function Sidebar() {
       {/* Collapse toggle */}
       <button
         onClick={() => setCollapsed(v => !v)}
-        className="relative z-10 mx-auto mb-4 w-8 h-8 rounded-full bg-earth/30 hover:bg-earth/50 flex items-center justify-center text-stone hover:text-sand transition-colors"
+        className="relative z-10 mx-auto mb-4 w-9 h-9 rounded-full bg-earth/30 hover:bg-earth/50 flex items-center justify-center text-stone hover:text-sand transition-colors"
       >
-        {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+        {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
       </button>
     </aside>
   )

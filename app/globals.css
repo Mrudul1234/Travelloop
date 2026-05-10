@@ -133,6 +133,38 @@ body {
   scrollbar-width: none;
 }
 
+/* Glassmorphism utility */
+.glass {
+  background: rgba(252, 231, 187, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-deep {
+  background: rgba(74, 47, 33, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Typography Scale */
+h1, .font-display {
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+h2, h3 {
+  letter-spacing: -0.01em;
+}
+
+/* Base sizing overrides */
+.text-xs { font-size: 0.875rem; } /* 14px */
+.text-sm { font-size: 1rem; }    /* 16px */
+.text-base { font-size: 1.125rem; } /* 18px */
+.text-lg { font-size: 1.25rem; }   /* 20px */
+.text-xl { font-size: 1.5rem; }    /* 24px */
+
 /* Activity type colors */
 .activity-sightseeing {
   border-color: var(--earth);
@@ -148,6 +180,39 @@ body {
 
 .activity-stay {
   border-color: var(--stone);
+}
+
+/* Device safe areas */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Image rendering smoothness */
+img {
+  image-rendering: -webkit-optimize-contrast;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Scroll reveal animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes soft-zoom {
+  from { transform: scale(1.05); }
+  to { transform: scale(1.15); }
+}
+
+.animate-soft-zoom {
+  animation: soft-zoom 20s infinite alternate ease-in-out;
 }
 
 .activity-adventure {
