@@ -6,32 +6,28 @@ echo.
 
 cd /d "C:\Users\mrudu\OneDrive\Desktop\Travelloop"
 
-echo Cleaning up local Git history...
-rd /s /q .git 2>nul
-git init
-
 echo Setting git identity...
 git config user.email "mrudulmistry@gmail.com"
 git config user.name "Mrudul1234"
 
 echo Cleaning up sensitive files...
 del set_vercel_env.ps1 2>nul
+git rm --cached *.ps1 2>nul
+git rm --cached push_log.txt 2>nul
 
-echo Staging files...
+echo Staging changes...
 git add .
 
-echo Committing clean build...
-git commit -m "Initial Clean Build"
+echo Committing changes...
+git commit -m "Standard Update: Fixed Suspense and Build Config"
 
 echo.
-echo Attempting to Force Push to GitHub...
-git remote add origin https://github.com/Mrudul1234/Travelloop >> push_log.txt 2>&1
-git branch -M main >> push_log.txt 2>&1
-git push -u origin main --force >> push_log.txt 2>&1
+echo Pushing to GitHub...
+git push origin main
 
 echo.
 echo ===================================================
-echo DONE! Check push_log.txt if you see any errors.
+echo DONE! Your changes are now on GitHub.
 echo https://github.com/Mrudul1234/Travelloop
 echo ===================================================
 pause

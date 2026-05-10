@@ -24,7 +24,7 @@ const TRAVEL_STYLES = [
   { id: 'luxury', label: 'Luxury', hindi: 'विलासिता', icon: '✨' },
 ]
 
-export default function NewTripPage() {
+function NewTripContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const supabase = createClient()
@@ -339,5 +339,19 @@ export default function NewTripPage() {
       </div>
       <BottomNav />
     </div>
+  )
+}
+
+import { Suspense } from 'react'
+
+export default function NewTripPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-sand flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-earth animate-spin" />
+      </div>
+    }>
+      <NewTripContent />
+    </Suspense>
   )
 }
