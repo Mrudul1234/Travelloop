@@ -176,7 +176,6 @@ export default function BudgetPage() {
                 })}
               </div>
             )}
-          </div>
         </div>
       </div>
 
