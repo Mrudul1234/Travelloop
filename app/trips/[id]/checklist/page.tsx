@@ -7,6 +7,7 @@ import { ArrowLeft, Plus, Check, Sparkles, Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { BottomNav } from '@/components/layout/BottomNav'
+import { MainContent } from '@/components/layout/MainContent'
 import { GrainOverlay } from '@/components/ui/GrainOverlay'
 import { MandalaWatermark } from '@/components/ui/MandalaWatermark'
 import { suggestChecklist } from '@/lib/api'
@@ -80,7 +81,7 @@ export default function ChecklistPage() {
   return (
     <div className="min-h-screen bg-sand flex">
       <Sidebar />
-      <div className="flex-1 md:ml-[240px] pb-20 md:pb-0">
+      <MainContent>
         <GrainOverlay />
         <div className="relative bg-deep px-6 md:px-10 py-6 overflow-hidden">
           <MandalaWatermark size={250} opacity={0.06} color="#FCD594" className="right-4 top-1/2 -translate-y-1/2" />
@@ -171,7 +172,7 @@ export default function ChecklistPage() {
             </div>
           )}
         </div>
-      </div>
+      </MainContent>
       <BottomNav />
     </div>
   )

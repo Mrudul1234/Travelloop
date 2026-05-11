@@ -8,6 +8,7 @@ import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { BottomNav } from '@/components/layout/BottomNav'
+import { MainContent } from '@/components/layout/MainContent'
 import { GrainOverlay } from '@/components/ui/GrainOverlay'
 import { MandalaWatermark } from '@/components/ui/MandalaWatermark'
 import { ArchImage } from '@/components/ui/ArchImage'
@@ -59,7 +60,7 @@ export default function TripsPage() {
   return (
     <div className="min-h-screen bg-sand flex">
       <Sidebar />
-      <div className="flex-1 md:ml-[240px] pb-20 md:pb-0">
+      <MainContent>
         <GrainOverlay />
 
         {/* Header */}
@@ -67,7 +68,7 @@ export default function TripsPage() {
           <MandalaWatermark size={300} opacity={0.06} color="#FCD594" className="right-4 top-1/2 -translate-y-1/2" />
           <div className="relative z-10 flex items-end justify-between">
             <div>
-              <p className="font-syne text-xs text-sun/50 uppercase tracking-widest mb-1">मेरी यात्राएं</p>
+              <p className="font-syne text-sm text-sun/50 uppercase tracking-widest mb-1">मेरी यात्राएं</p>
               <h1 className="font-display text-4xl text-sand">My Trips</h1>
             </div>
             <Link href="/trips/new" className="flex items-center gap-2 bg-sun hover:bg-stone text-deep font-syne font-bold text-xs px-5 py-2.5 rounded-full transition-all">
@@ -164,7 +165,7 @@ export default function TripsPage() {
             </div>
           )}
         </div>
-      </div>
+      </MainContent>
       <BottomNav />
     </div>
   )

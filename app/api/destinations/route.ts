@@ -10,7 +10,7 @@ export async function GET() {
     
     // Shuffle and pick 12 interesting ones or just return all
     // Let's return the first 20 for now to keep it fast
-    return NextResponse.json(data.slice(0, 24))
+    return NextResponse.json(data.slice(0, 100))
   } catch (error) {
     console.error('Failed to read dataset:', error)
     return NextResponse.json({ error: 'Failed to load destinations' }, { status: 500 })

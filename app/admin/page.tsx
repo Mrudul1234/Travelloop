@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Users, Map, IndianRupee, Globe, TrendingUp, Activity, ShieldCheck, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 import { Sidebar } from '@/components/layout/Sidebar'
+import { MainContent } from '@/components/layout/MainContent'
 import { GrainOverlay } from '@/components/ui/GrainOverlay'
 import { MandalaWatermark } from '@/components/ui/MandalaWatermark'
 import { formatCurrency } from '@/lib/utils'
@@ -62,7 +63,7 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-sand flex">
       <Sidebar />
-      <div className="flex-1 md:ml-[240px] p-6 md:p-10 relative overflow-hidden">
+      <MainContent className="p-6 md:p-10 relative overflow-hidden">
         <GrainOverlay />
         <MandalaWatermark size={600} opacity={0.03} color="#724E43" className="-right-20 -top-20" />
 
@@ -193,7 +194,7 @@ export default function AdminDashboard() {
             </div>
           </div>
         </div>
-      </div>
+      </MainContent>
     </div>
   )
 }

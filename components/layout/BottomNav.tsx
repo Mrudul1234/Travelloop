@@ -14,10 +14,19 @@ const NAV_ITEMS = [
 
 export function BottomNav() {
   const pathname = usePathname()
+
+  const isActive = (href: string) => {
+    if (href === '/trips') {
+      return pathname === '/trips' || (pathname.startsWith('/trips/') && !pathname.startsWith('/trips/new'))
+    }
+    if (pathname === href) return true
+    return pathname.startsWith(href + '/')
+  }
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-deep/90 glass-deep border-t border-earth/20 flex md:hidden z-40 px-2 pb-safe">
       {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
-        const active = pathname === href || pathname.startsWith(href + '/')
+        const active = isActive(href)
         return (
           <Link
             key={href}

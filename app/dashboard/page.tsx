@@ -7,6 +7,7 @@ import { PlusCircle, MapPin, Compass, TrendingUp, Calendar } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { BottomNav } from '@/components/layout/BottomNav'
+import { MainContent } from '@/components/layout/MainContent'
 import { MandalaWatermark } from '@/components/ui/MandalaWatermark'
 import { GrainOverlay } from '@/components/ui/GrainOverlay'
 import { ArchImage } from '@/components/ui/ArchImage'
@@ -14,12 +15,13 @@ import { JaliDivider } from '@/components/ui/JaliDivider'
 import { Badge } from '@/components/ui/Badge'
 import { formatCurrency, dateRange, daysBetween, getGreetingTime, tripStatus } from '@/lib/utils'
 import { getFallbackPhoto } from '@/lib/api'
+import { getCityPhoto } from '@/lib/photos'
 
 const INSPIRATION = [
-  { city: 'Jaipur', tag: 'Rajasthan', photo: 'https://images.unsplash.com/photo-1477587458883-47145ed6736c?w=400&q=80' },
-  { city: 'Varanasi', tag: 'Spiritual', photo: 'https://images.unsplash.com/photo-1561361058-c24e0b74f2b0?w=400&q=80' },
+  { city: 'Jaipur', tag: 'Rajasthan', photo: 'https://images.unsplash.com/photo-1599661046289-e31897846e41?w=400&q=80' },
+  { city: 'Varanasi', tag: 'Spiritual', photo: 'https://images.unsplash.com/photo-1561361058-c24cecae35ca?w=400&q=80' },
   { city: 'Goa', tag: 'Beaches', photo: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=400&q=80' },
-  { city: 'Leh', tag: 'Mountains', photo: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80' },
+  { city: 'Leh', tag: 'Mountains', photo: 'https://images.unsplash.com/photo-1581793745862-99fde7fa73d2?w=400&q=80' },
   { city: 'Kerala', tag: 'Backwaters', photo: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=400&q=80' },
   { city: 'Hampi', tag: 'Heritage', photo: 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=400&q=80' },
 ]
@@ -52,23 +54,24 @@ export default function DashboardPage() {
       const ongoing = tripsData?.find(t => tripStatus(t.start_date, t.end_date) === 'ongoing')
       setOngoingTrip(ongoing || null)
       
-      // Load inspiration from dataset
-      const destRes = await fetch('/api/destinations')
-      const destData = await destRes.json()
-      // Shuffle and pick 6
-      const shuffled = [...destData].sort(() => 0.5 - Math.random()).slice(0, 6)
-      
-      // Fetch photos for these 6
-      const withPhotos = await Promise.all(shuffled.map(async (d: any) => {
-        const photoRes = await fetch(`/api/photos?city=${encodeURIComponent(d.destination_name)}`)
-        const photoData = await photoRes.json()
-        return {
-          city: d.destination_name,
-          tag: d.state,
-          photo: photoData.photos?.[0]?.url || 'https://images.unsplash.com/photo-1548013146-72479768bada?w=400&q=80'
+      // Load inspiration from dataset — use INSPIRATION fallback immediately, then try to load from API
+      try {
+        const destRes = await fetch('/api/destinations')
+        const destData = await destRes.json()
+        if (Array.isArray(destData) && destData.length > 0) {
+          // Shuffle and pick 6 — assign photos from local map (no API waterfall)
+          const shuffled = [...destData].sort(() => 0.5 - Math.random()).slice(0, 6)
+          setInspiration(shuffled.map((d: any) => ({
+            city: d.destination_name,
+            tag: d.state,
+            photo: getCityPhoto(d.destination_name, d.state)
+          })))
+        } else {
+          setInspiration(INSPIRATION)
         }
-      }))
-      setInspiration(withPhotos)
+      } catch {
+        setInspiration(INSPIRATION)
+      }
       
       setLoading(false)
     }
@@ -80,17 +83,17 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-sand flex">
       <Sidebar />
-      <div className="flex-1 md:ml-[240px] pb-20 md:pb-0">
+      <MainContent>
         <GrainOverlay />
 
         {/* Hero section */}
-        <div className="relative bg-deep px-6 md:px-10 py-12 overflow-hidden transition-all duration-700">
+        <div className="relative bg-deep px-6 md:px-10 py-12 overflow-hidden transition-all duration-300 ease-in-out">
           {/* Dynamic Hero Background */}
           {ongoingTrip && (
             <div className="absolute inset-0 z-0">
               <img 
                 src={ongoingTrip.cover_photo} 
-                className="w-full h-full object-cover opacity-30 scale-105 animate-soft-zoom" 
+                className="w-full h-full object-cover object-center opacity-30 scale-105 animate-soft-zoom" 
                 alt="Current Trip"
               />
               <div className="absolute inset-0 bg-gradient-to-b from-deep/20 via-deep to-deep" />
@@ -103,13 +106,13 @@ export default function DashboardPage() {
               <Badge variant="success" className="mb-3 animate-pulse">Ongoing Trip: {ongoingTrip.name}</Badge>
             )}
             <p
-              className="font-syne text-sm text-sun/70 uppercase tracking-widest mb-1"
+              className="font-syne text-lg text-sun/80 font-bold uppercase tracking-widest mb-1"
               style={{ fontFamily: "'Noto Sans Devanagari', sans-serif" }}
             >
               {greeting}
             </p>
             <h1 className="font-display text-3xl md:text-5xl text-sand leading-[1.1]">
-              Namaste, <span className="text-sun">{userName}</span> 🙏
+              Welcome, <span className="text-sun">{userName}</span>
             </h1>
             <p className="font-dm-sans text-sand/50 text-xs md:text-sm mt-2">Your next adventure awaits. Chalo plan karte hain!</p>
 
@@ -209,10 +212,11 @@ export default function DashboardPage() {
                 >
                   <Link href={`/trips/new?city=${encodeURIComponent(city)}`}>
                     <div className="relative overflow-hidden rounded-2xl group cursor-pointer h-36">
-                      <img
+                      <ArchImage
                         src={photo}
                         alt={city}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full group-hover:scale-105 transition-transform duration-300"
+                        noArch
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-deep/70 to-transparent" />
                       <div className="absolute bottom-0 left-0 p-3">
@@ -226,7 +230,7 @@ export default function DashboardPage() {
             </div>
           </section>
         </div>
-      </div>
+      </MainContent>
       <BottomNav />
     </div>
   )

@@ -33,7 +33,7 @@ export function Input({
           {labelHindi && (
             <span
               className="text-earth/60 font-normal normal-case tracking-normal"
-              style={{ fontFamily: "'Noto Sans Devanagari', sans-serif", fontSize: '11px' }}
+              style={{ fontFamily: "'Noto Sans Devanagari', sans-serif", fontSize: '14px' }}
             >
               / {labelHindi}
             </span>
@@ -93,7 +93,7 @@ export function Textarea({ label, labelHindi, error, className = '', id, ...prop
           {labelHindi && (
             <span
               className="text-earth/60 font-normal normal-case tracking-normal"
-              style={{ fontFamily: "'Noto Sans Devanagari', sans-serif", fontSize: '11px' }}
+              style={{ fontFamily: "'Noto Sans Devanagari', sans-serif", fontSize: '14px' }}
             >
               / {labelHindi}
             </span>

@@ -8,10 +8,12 @@ import { ArrowLeft, Edit2, MapPin, Calendar, Wallet, Map, CheckSquare, BarChart2
 import { createClient } from '@/lib/supabase'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { BottomNav } from '@/components/layout/BottomNav'
+import { MainContent } from '@/components/layout/MainContent'
 import { GrainOverlay } from '@/components/ui/GrainOverlay'
 import { MandalaWatermark } from '@/components/ui/MandalaWatermark'
 import { JaliDivider } from '@/components/ui/JaliDivider'
 import { Badge } from '@/components/ui/Badge'
+import { ArchImage } from '@/components/ui/ArchImage'
 import { formatCurrency, dateRange, daysBetween, tripStatus, getActivityIcon } from '@/lib/utils'
 import { getFallbackPhoto } from '@/lib/api'
 import toast from 'react-hot-toast'
@@ -64,12 +66,12 @@ export default function TripViewPage() {
   return (
     <div className="min-h-screen bg-sand flex">
       <Sidebar />
-      <div className="flex-1 md:ml-[240px] pb-20 md:pb-0">
+      <MainContent>
         <GrainOverlay />
 
         {/* Hero */}
         <div className="relative h-64 bg-deep overflow-hidden">
-          <img
+          <ArchImage
             src={trip?.cover_photo || getFallbackPhoto(trip?.name || '')}
             alt={trip?.name}
             className="w-full h-full object-cover opacity-40"
@@ -186,10 +188,10 @@ export default function TripViewPage() {
                     className="flex items-center gap-4 bg-sun/50 border border-stone/20 rounded-2xl p-3"
                   >
                     <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
-                      <img
+                      <ArchImage
                         src={getFallbackPhoto(stop.city_name)}
                         alt={stop.city_name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full"
                       />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -228,7 +230,7 @@ export default function TripViewPage() {
             </button>
           </div>
         </div>
-      </div>
+      </MainContent>
       <BottomNav />
     </div>
   )

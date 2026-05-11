@@ -16,8 +16,10 @@ export type Database = {
           id: string
           full_name: string | null
           avatar_url: string | null
+          bio: string | null
           language: string | null
           created_at: string
+          updated_at: string
         }
       }
       trips: {
@@ -30,6 +32,9 @@ export type Database = {
           start_date: string | null
           end_date: string | null
           total_budget: number
+          spent_budget: number
+          travel_style: string[] | null
+          status: 'draft' | 'upcoming' | 'ongoing' | 'past' | null
           is_public: boolean
           slug: string | null
           created_at: string

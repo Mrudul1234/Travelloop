@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase'
 import { searchCities, generateItinerary, getFallbackPhoto } from '@/lib/api'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { BottomNav } from '@/components/layout/BottomNav'
+import { MainContent } from '@/components/layout/MainContent'
 import { GrainOverlay } from '@/components/ui/GrainOverlay'
 import { MandalaWatermark } from '@/components/ui/MandalaWatermark'
 import { JaliDivider } from '@/components/ui/JaliDivider'
@@ -188,14 +189,14 @@ function NewTripContent() {
   return (
     <div className="min-h-screen bg-sand flex">
       <Sidebar />
-      <div className="flex-1 md:ml-[240px] pb-20 md:pb-0">
+      <MainContent>
         <GrainOverlay />
 
         {/* Header */}
         <div className="relative bg-deep px-6 md:px-10 py-8 overflow-hidden">
           <MandalaWatermark size={300} opacity={0.06} color="#FCD594" className="right-4 top-1/2 -translate-y-1/2" />
           <div className="relative z-10">
-            <p className="font-syne text-xs text-sun/50 uppercase tracking-widest mb-1">नई यात्रा</p>
+            <p className="font-syne text-sm text-sun/50 uppercase tracking-widest mb-1">नई यात्रा</p>
             <h1 className="font-display text-4xl text-sand">Plan a New Trip</h1>
             <p className="font-dm-sans text-sand/50 text-sm mt-1">Tell us where you want to go</p>
           </div>
@@ -289,7 +290,7 @@ function NewTripContent() {
                             <span className="font-dm-sans text-sm text-deep">{city.name}</span>
                             <span className="font-syne text-xs text-dust ml-2">{city.state}</span>
                           </div>
-                          <span className="font-syne text-xs text-earth" style={{ fontFamily: "'Noto Sans Devanagari', sans-serif" }}>
+                          <span className="font-syne text-sm text-earth" style={{ fontFamily: "'Noto Sans Devanagari', sans-serif" }}>
                             {city.nameHindi}
                           </span>
                         </button>
@@ -382,7 +383,7 @@ function NewTripContent() {
                   >
                     <span className="text-3xl mb-1">{icon}</span>
                     <span className="font-outfit text-[11px] font-bold uppercase tracking-tight leading-tight">{label}</span>
-                    <span className="text-[10px] opacity-60 font-medium" style={{ fontFamily: "'Noto Sans Devanagari', sans-serif" }}>{hindi}</span>
+                    <span className="text-[12px] opacity-60 font-medium" style={{ fontFamily: "'Noto Sans Devanagari', sans-serif" }}>{hindi}</span>
                   </button>
                 )
               })}
@@ -411,7 +412,7 @@ function NewTripContent() {
             </button>
           </div>
         </div>
-      </div>
+      </MainContent>
       <BottomNav />
     </div>
   )

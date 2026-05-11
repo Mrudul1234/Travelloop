@@ -7,6 +7,7 @@ import { ArrowLeft, Plus, Trash2, PieChart, Wallet, CreditCard, ShoppingBag, Ute
 import { createClient } from '@/lib/supabase'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { BottomNav } from '@/components/layout/BottomNav'
+import { MainContent } from '@/components/layout/MainContent'
 import { GrainOverlay } from '@/components/ui/GrainOverlay'
 import { MandalaWatermark } from '@/components/ui/MandalaWatermark'
 import { formatCurrency } from '@/lib/utils'
@@ -98,7 +99,7 @@ export default function BudgetPage() {
   return (
     <div className="min-h-screen bg-sand flex">
       <Sidebar />
-      <div className="flex-1 md:ml-[240px] pb-20 md:pb-0">
+      <MainContent>
         <GrainOverlay />
         
         {/* Header */}
@@ -258,7 +259,7 @@ export default function BudgetPage() {
           </div>
         )}
       </AnimatePresence>
-
+      </MainContent>
       <BottomNav />
     </div>
   )

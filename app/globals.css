@@ -13,6 +13,7 @@
   --deep: #4A2F21;
   --danger: #C0392B;
   --ok: #5D8A5E;
+  --sidebar-w: 240px;
 }
 
 * {
@@ -121,6 +122,15 @@ body {
 /* Devanagari font utility */
 .font-devanagari {
   font-family: 'Noto Sans Devanagari', sans-serif;
+  font-size: 0.9375rem; /* 15px — slightly larger for readability */
+  line-height: 1.3;
+}
+
+/* Main content area — responds to sidebar collapse */
+@media (min-width: 768px) {
+  .main-content-area {
+    margin-left: var(--sidebar-w, 240px);
+  }
 }
 
 /* Scrollbar hide utility */

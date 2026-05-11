@@ -2,20 +2,32 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { User, Mail, Globe, LogOut, Camera, Save, MapPin, Calendar, Heart } from 'lucide-react'
+import { User, Mail, Globe, LogOut, Camera, Save, MapPin, Calendar, Heart, Award, Lock, Check } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { BottomNav } from '@/components/layout/BottomNav'
+import { MainContent } from '@/components/layout/MainContent'
 import { GrainOverlay } from '@/components/ui/GrainOverlay'
 import { MandalaWatermark } from '@/components/ui/MandalaWatermark'
 import { JaliDivider } from '@/components/ui/JaliDivider'
 import toast from 'react-hot-toast'
 
+const LANGUAGES = ['English', 'Hindi', 'Bengali', 'Tamil', 'Telugu', 'Marathi']
+
+const ALL_BADGES = [
+  { icon: '🏯', label: 'Heritage Hunter', description: 'Create your first trip', requirement: (s: any) => s.trips >= 1 },
+  { icon: '🚂', label: 'Rail Rover', description: 'Plan trips to 3+ cities', requirement: (s: any) => s.cities >= 3 },
+  { icon: '🍛', label: 'Spice Seeker', description: 'Complete 5+ trips', requirement: (s: any) => s.trips >= 5 },
+  { icon: '🧗', label: 'Himalayan Hero', description: 'Travel for 30+ days total', requirement: (s: any) => s.days >= 30 },
+  { icon: '🌍', label: 'Wanderlust Soul', description: 'Visit 10+ unique cities', requirement: (s: any) => s.cities >= 10 },
+  { icon: '📸', label: 'Memory Maker', description: 'Create 10+ trips', requirement: (s: any) => s.trips >= 10 },
+]
+
 export default function ProfilePage() {
   const supabase = createClient()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [profile, setProfile] = useState({ full_name: '', email: '', avatar_url: '', bio: '' })
+  const [profile, setProfile] = useState({ full_name: '', email: '', avatar_url: '', bio: '', language: 'English' })
   const [stats, setStats] = useState({ trips: 0, cities: 0, days: 0 })
 
   useEffect(() => {
@@ -29,13 +41,19 @@ export default function ProfilePage() {
         email: user.email || '',
         avatar_url: profileData?.avatar_url || '',
         bio: profileData?.bio || '',
+        language: profileData?.language || 'English',
       })
 
       // Fetch stats
       const { data: trips } = await supabase.from('trips').select('id, start_date, end_date').eq('user_id', user.id)
-      const { data: stops } = await supabase.from('stops').select('city_name').in('trip_id', trips?.map(t => t.id) || [])
+      const tripIds = trips?.map(t => t.id) || []
       
-      const uniqueCities = new Set(stops?.map(s => s.city_name)).size
+      let uniqueCities = 0
+      if (tripIds.length > 0) {
+        const { data: stops } = await supabase.from('stops').select('city_name').in('trip_id', tripIds)
+        uniqueCities = new Set(stops?.map(s => s.city_name)).size
+      }
+      
       const totalDays = (trips || []).reduce((acc, t) => {
         if (t.start_date && t.end_date) {
           const start = new Date(t.start_date)
@@ -67,6 +85,7 @@ export default function ProfilePage() {
         full_name: profile.full_name,
         bio: profile.bio,
         avatar_url: profile.avatar_url,
+        language: profile.language,
         updated_at: new Date().toISOString(),
       })
 
@@ -126,6 +145,8 @@ export default function ProfilePage() {
     window.location.href = '/auth'
   }
 
+  const unlockedCount = ALL_BADGES.filter(b => b.requirement(stats)).length
+
   if (loading) {
     return (
       <div className="min-h-screen bg-sand flex items-center justify-center">
@@ -137,7 +158,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-sand flex">
       <Sidebar />
-      <div className="flex-1 md:ml-[240px] pb-20 md:pb-0">
+      <MainContent>
         <GrainOverlay />
         
         {/* Header */}
@@ -184,6 +205,11 @@ export default function ProfilePage() {
                   <p className="font-display text-xl text-sun">{stats.days}</p>
                   <p className="font-syne text-[10px] text-sand/40 uppercase tracking-wide">Days</p>
                 </div>
+                <div className="w-px h-6 bg-earth/30" />
+                <div className="text-center">
+                  <p className="font-display text-xl text-sun">{unlockedCount}/{ALL_BADGES.length}</p>
+                  <p className="font-syne text-[10px] text-sand/40 uppercase tracking-wide">Badges</p>
+                </div>
               </div>
             </div>
           </div>
@@ -193,7 +219,7 @@ export default function ProfilePage() {
           <div className="space-y-6">
             <h2 className="font-playfair text-2xl text-deep">Profile Settings</h2>
             
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
                 <label className="font-syne text-xs text-earth uppercase tracking-wide block mb-2">Full Name</label>
                 <div className="relative">
@@ -219,10 +245,26 @@ export default function ProfilePage() {
               </div>
               
               <div>
-                <label className="font-syne text-xs text-earth uppercase tracking-wide block mb-2">Language Preference</label>
-                <div className="flex gap-2">
-                  {['English', 'Hindi', 'Bengali', 'Tamil'].map(lang => (
-                    <button key={lang} className="px-4 py-2 rounded-full border border-stone/30 text-xs font-syne text-deep hover:bg-sun/40 transition-colors">
+                <label className="font-syne text-xs text-earth uppercase tracking-wide block mb-2">
+                  <Globe size={14} className="inline mr-1 -mt-0.5" />
+                  Language Preference
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {LANGUAGES.map(lang => (
+                    <button 
+                      key={lang}
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setProfile(p => ({ ...p, language: lang }));
+                      }}
+                      className={`px-4 py-2 rounded-full border text-xs font-syne transition-all duration-200 flex items-center gap-1.5 ${
+                        profile.language === lang 
+                          ? 'bg-earth text-sand border-earth shadow-md' 
+                          : 'bg-white/50 border-stone/20 text-deep hover:bg-white'
+                      }`}
+                    >
+                      {profile.language === lang && <Check size={12} strokeWidth={3} />}
                       {lang}
                     </button>
                   ))}
@@ -230,46 +272,70 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 pt-6">
+            <div className="flex flex-col sm:flex-row gap-4 pt-8">
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="flex-1 flex items-center justify-center gap-2 bg-earth hover:bg-deep text-sand font-syne font-bold text-sm py-3.5 rounded-full transition-all"
+                className="flex-1 flex items-center justify-center gap-2 bg-earth hover:bg-deep text-sand font-syne font-bold text-sm py-4 rounded-2xl shadow-lg shadow-earth/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
               >
-                {saving ? 'Saving...' : <><Save size={16} /> Save Changes</>}
+                {saving ? 'Saving...' : <><Save size={18} /> Save Settings</>}
               </button>
               <button
                 onClick={handleSignOut}
-                className="flex items-center justify-center gap-2 bg-sun/40 hover:bg-sun/60 text-deep font-syne font-bold text-sm px-8 py-3.5 rounded-full transition-all"
+                className="flex items-center justify-center gap-2 bg-sun/40 hover:bg-sun/60 text-deep font-syne font-bold text-sm px-8 py-4 rounded-2xl transition-all"
               >
-                <LogOut size={16} /> Sign Out
+                <LogOut size={18} /> Sign Out
               </button>
             </div>
             
             <JaliDivider />
             
+            {/* Badges & Achievements — now data-driven from stats */}
             <div className="pt-4">
-              <h3 className="font-playfair text-xl text-deep mb-4">Badges & Achievements</h3>
-              <div className="flex flex-wrap gap-4">
-                {[
-                  { icon: '🏯', label: 'Heritage Hunter' },
-                  { icon: '🚂', label: 'Rail Rover' },
-                  { icon: '🍛', label: 'Spice Seeker' },
-                  { icon: '🧗', label: 'Himalayan Hero' },
-                ].map(badge => (
-                  <div key={badge.label} className="flex flex-col items-center gap-2 bg-sun/30 border border-stone/20 rounded-2xl p-4 w-28 text-center grayscale hover:grayscale-0 transition-all cursor-help group relative">
-                    <span className="text-3xl">{badge.icon}</span>
-                    <span className="font-syne text-[10px] text-deep uppercase leading-tight">{badge.label}</span>
-                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-deep text-sand text-[9px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                      Complete more trips to unlock
-                    </div>
-                  </div>
-                ))}
+              <div className="flex items-center gap-3 mb-6">
+                <Award size={20} className="text-earth" />
+                <h3 className="font-playfair text-xl text-deep">Badges & Achievements</h3>
+                <span className="ml-auto font-syne text-[10px] text-dust uppercase tracking-widest">
+                  {unlockedCount} of {ALL_BADGES.length} unlocked
+                </span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {ALL_BADGES.map((badge, i) => {
+                  const unlocked = badge.requirement(stats)
+                  return (
+                    <motion.div 
+                      key={badge.label}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: i * 0.08 }}
+                      className={`relative flex flex-col items-center gap-2 border rounded-2xl p-5 text-center transition-all duration-300 ${
+                        unlocked 
+                          ? 'bg-sun/40 border-earth/30 shadow-md shadow-earth/10' 
+                          : 'bg-white/30 border-stone/15 opacity-50'
+                      }`}
+                    >
+                      {/* Unlocked indicator */}
+                      {unlocked && (
+                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-ok rounded-full flex items-center justify-center shadow-sm">
+                          <Check size={12} className="text-sand" />
+                        </div>
+                      )}
+                      {!unlocked && (
+                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-stone/40 rounded-full flex items-center justify-center">
+                          <Lock size={10} className="text-dust" />
+                        </div>
+                      )}
+                      <span className="text-3xl">{badge.icon}</span>
+                      <span className="font-syne text-[10px] text-deep uppercase leading-tight font-bold">{badge.label}</span>
+                      <span className="font-dm-sans text-[9px] text-dust leading-tight">{badge.description}</span>
+                    </motion.div>
+                  )
+                })}
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </MainContent>
       <BottomNav />
     </div>
   )

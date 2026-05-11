@@ -1,6 +1,8 @@
+import type { Metadata } from 'next'
 import { Playfair_Display, Inter, Syne, Cormorant_Garamond, Outfit } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'react-hot-toast'
+import { ClientProviders } from '@/components/layout/ClientProviders'
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -45,6 +47,7 @@ export const metadata: Metadata = {
   },
 }
 
+
 export default function RootLayout({
   children,
 }: {
@@ -61,7 +64,9 @@ export default function RootLayout({
         />
       </head>
       <body className="font-inter bg-sand text-sm antialiased">
-        {children}
+        <ClientProviders>
+          {children}
+        </ClientProviders>
         <Toaster
           position="top-right"
           toastOptions={{

@@ -24,12 +24,15 @@ export function ArchImage({
   noArch = false,
 }: ArchImageProps) {
   const [loading, setLoading] = useState(true)
+  const [hasError, setHasError] = useState(false)
 
   const borderRadiusStyle = noArch ? 'inherit' : (
     typeof width === 'number' 
       ? `${width / 2}px ${width / 2}px 12px 12px`
       : '50% 50% 12px 12px'
   )
+
+  const fallbackSrc = 'https://images.unsplash.com/photo-1548013146-72479768bada?w=800&q=80'
 
   return (
     <div
@@ -41,25 +44,26 @@ export function ArchImage({
       }}
     >
       {/* Loading Skeleton */}
-      {loading && (
+      {loading && !hasError && (
         <div className="absolute inset-0 bg-sun/40 animate-pulse flex items-center justify-center z-10">
           <div className="w-8 h-8 rounded-full border-2 border-earth/20 border-t-earth animate-spin" />
         </div>
       )}
 
       <img
-        src={src}
+        src={hasError ? fallbackSrc : src}
         alt={alt}
         onLoad={() => setLoading(false)}
         loading="lazy"
-        className={`w-full h-full object-cover transition-all duration-700 aspect-video ${loading ? 'opacity-0 scale-105' : 'opacity-100 scale-100 group-hover:scale-110'}`}
+        className={`w-full h-full object-cover transition-opacity duration-500 ${loading ? 'opacity-0' : 'opacity-100 group-hover:scale-110'} transition-transform duration-700`}
         style={{
           filter: 'saturate(1.05) sepia(0.05)',
         }}
-        onError={(e) => {
-          setLoading(false)
-          const target = e.target as HTMLImageElement
-          target.src = `https://images.unsplash.com/photo-1548013146-72479768bada?w=800&q=80`
+        onError={() => {
+          if (!hasError) {
+            setHasError(true)
+            setLoading(false)
+          }
         }}
       />
       

@@ -12,6 +12,7 @@ import { MandalaWatermark } from '@/components/ui/MandalaWatermark'
 import { Badge } from '@/components/ui/Badge'
 import { getActivityTypeLabel, getActivityIcon } from '@/lib/utils'
 import { generateItinerary, getFallbackPhoto } from '@/lib/api'
+import { ArchImage } from '@/components/ui/ArchImage'
 import toast from 'react-hot-toast'
 
 export default function TripBuildPage() {
@@ -40,16 +41,18 @@ export default function TripBuildPage() {
       setStops(stopsArr)
       if (stopsArr.length > 0) setActiveStop(stopsArr[0].id)
 
-      // Load activities for each stop
+      // Load activities for all stops in one go
+      const stopIds = stopsArr.map(s => s.id)
+      const { data: allActivities } = await supabase
+        .from('activities')
+        .select('*')
+        .in('stop_id', stopIds)
+        .order('day_number, time')
+      
       const activitiesMap: Record<string, any[]> = {}
-      for (const stop of stopsArr) {
-        const { data: acts } = await supabase
-          .from('activities')
-          .select('*')
-          .eq('stop_id', stop.id)
-          .order('day_number, time')
-        activitiesMap[stop.id] = acts || []
-      }
+      stopsArr.forEach(stop => {
+        activitiesMap[stop.id] = (allActivities || []).filter(a => a.stop_id === stop.id)
+      })
       setActivities(activitiesMap)
       setLoading(false)
     }
@@ -180,10 +183,10 @@ export default function TripBuildPage() {
             <div key={stop.id} className="px-6 md:px-10 py-6">
               {/* Stop Banner */}
               <div className="relative h-32 rounded-2xl overflow-hidden mb-6 group">
-                <img
+                <ArchImage
                   src={getFallbackPhoto(stop.city_name)}
                   alt={stop.city_name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full"
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-deep/80 to-transparent" />
                 <div className="absolute inset-0 flex flex-col justify-center p-6">
