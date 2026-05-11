@@ -33,7 +33,7 @@ git add .
 echo.
 echo 💾 Committing changes...
 set /p commit_msg="Enter commit message (or press Enter for default): "
-if "!commit_msg!"=="" set commit_msg="🚀 HACKATHON FINAL SUBMISSION: Travelloop AI Travel Planner (Full Feature Set) ✨🗺️"
+if "!commit_msg!"=="" set commit_msg="FINAL HACKATHON SUBMISSION"
 
 git commit -m "!commit_msg!"
 
