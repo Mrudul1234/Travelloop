@@ -4,6 +4,8 @@
 
 [![YouTube Video](https://img.shields.io/badge/YouTube-Watch%20Demo-red?style=for-the-badge&logo=youtube)](https://youtu.be/iBX1ICdOFOk?si=fuQ9tXF_Lm_Igd5H)
 
+[![Travelloop](https://travelloop-eta.vercel.app/)]
+
 ---
 
 ## ✨ Project Previews
