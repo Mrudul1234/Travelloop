@@ -38,9 +38,9 @@ India has **1.4 billion stories** and **500+ extraordinary destinations**. Most 
 
 ---
 
-## 🚀 Live Demo
+## 📸 Snap Shots
 
-**[👉 Try Traveloop Now →](https://travelloop-eta.vercel.app/)**
+
 
 <p align="center">
   <img src="preview-dashboard.png" width="48%" alt="Dashboard" />
