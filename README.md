@@ -4,7 +4,7 @@
 
 [![YouTube Video](https://img.shields.io/badge/YouTube-Watch%20Demo-red?style=for-the-badge&logo=youtube)](https://youtu.be/iBX1ICdOFOk?si=fuQ9tXF_Lm_Igd5H)
 
-[![Travelloop](https://travelloop-eta.vercel.app/)]
+[![Live Site](https://img.shields.io/badge/Vercel-Live%20Site-black?style=for-the-badge&logo=vercel)](https://travelloop-eta.vercel.app/)
 
 ---
 
